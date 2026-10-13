@@ -38,7 +38,7 @@ export class TaskDefinition implements vscode.TaskDefinition {
         const uri = vscode.Uri.file(this.workspace);
         const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri) || vscode.TaskScope.Workspace;
         const task = new vscode.Task(
-            this,
+            settings.terminal.newPerRun ? this.toRunDefinition() : this,
             workspaceFolder,
             this.name,
             this.type,
@@ -48,6 +48,27 @@ export class TaskDefinition implements vscode.TaskDefinition {
             )
         );
         task.detail = this.description;
+        if (settings.terminal.newPerRun) {
+            task.presentationOptions = {
+                panel: vscode.TaskPanelKind.New,
+                reveal: vscode.TaskRevealKind.Always,
+                showReuseMessage: false
+            };
+        }
         return task;
     }
+
+    // VS Code treats tasks with the same definition as the same task: a second run of a task that is still running
+    // asks which instance to terminate. A unique `args` entry gives every run its own identity, so runs start
+    // side by side, each in its own terminal.
+    private toRunDefinition(): vscode.TaskDefinition {
+        return {
+            type: this.type,
+            task: this.task,
+            workspace: this.workspace,
+            args: [`run-${Date.now()}-${++TaskDefinition.runCounter}`]
+        };
+    }
+
+    private static runCounter = 0;
 }

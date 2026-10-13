@@ -9,6 +9,7 @@ import { TreeSort, settings } from '../utils/settings.js';
 import { log } from '../utils/log.js';
 import { Taskfile } from "../models/taskfile.js";
 import { TaskDefinition } from "../models/taskDefinition.js";
+import { taskRuns } from "./taskRuns.js";
 
 const octokit = new Octokit();
 type ReleaseRequest = Endpoints["GET /repos/{owner}/{repo}/releases/latest"]["parameters"];
@@ -219,6 +220,7 @@ class TaskfileService {
     }
 
     public async runTask(definition: TaskDefinition, cliArgs?: string[]): Promise<void> {
+        taskRuns.rememberArgs(definition, cliArgs);
         vscode.tasks.executeTask(definition.toTask(cliArgs)).then((v) => {
             console.log(`Task started: ${v.task.name}`);
         });

@@ -3,7 +3,7 @@ import { log } from './utils/log.js';
 import { TaskExtension } from './task.js';
 
 export function activate(context: vscode.ExtensionContext) {
-	log.info("Extension activated");
+	log.info(`Extension activated (v${context.extension.packageJSON.version})`);
 
 	// Create a new instance of Tagger
 	let taskExtension: TaskExtension = new TaskExtension();

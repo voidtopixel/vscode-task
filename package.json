@@ -81,6 +81,18 @@
         "icon": "$(run-all)"
       },
       {
+        "command": "vscode-task.stopTask",
+        "title": "Stop Task",
+        "category": "Task",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "vscode-task.restartTask",
+        "title": "Restart Task",
+        "category": "Task",
+        "icon": "$(debug-restart)"
+      },
+      {
         "command": "vscode-task.runTaskPicker",
         "title": "Run Task",
         "category": "Task",
@@ -181,6 +193,14 @@
         {
           "command": "vscode-task.goToDefinition",
           "when": "false"
+        },
+        {
+          "command": "vscode-task.stopTask",
+          "when": "false"
+        },
+        {
+          "command": "vscode-task.restartTask",
+          "when": "false"
         }
       ],
       "view/title": [
@@ -208,18 +228,28 @@
       "view/item/context": [
         {
           "command": "vscode-task.goToDefinition",
-          "when": "view == vscode-task.tasks && viewItem == taskTreeItem",
+          "when": "view == vscode-task.tasks && viewItem =~ /^taskTreeItem/",
           "group": "inline@1"
         },
         {
           "command": "vscode-task.runTask",
-          "when": "view == vscode-task.tasks && viewItem == taskTreeItem",
+          "when": "view == vscode-task.tasks && viewItem =~ /^taskTreeItem/",
           "group": "inline@2"
         },
         {
           "command": "vscode-task.runTaskWithArgs",
-          "when": "view == vscode-task.tasks && viewItem == taskTreeItem",
+          "when": "view == vscode-task.tasks && viewItem =~ /^taskTreeItem/",
           "group": "inline@3"
+        },
+        {
+          "command": "vscode-task.restartTask",
+          "when": "view == vscode-task.tasks && viewItem == taskTreeItem.running",
+          "group": "inline@4"
+        },
+        {
+          "command": "vscode-task.stopTask",
+          "when": "view == vscode-task.tasks && viewItem == taskTreeItem.running",
+          "group": "inline@5"
         }
       ]
     },
@@ -262,6 +292,16 @@
           "light": "#ff9b05",
           "highContrast": "#ff9b05",
           "highContrastLight": "#ff9b05"
+        }
+      },
+      {
+        "id": "vscodetask.failedIcon",
+        "description": "Color for task icons in the activity bar when the last run failed.",
+        "defaults": {
+          "dark": "#f14c4c",
+          "light": "#e51400",
+          "highContrast": "#f14c4c",
+          "highContrastLight": "#e51400"
         }
       },
       {
@@ -331,6 +371,17 @@
                   "description": "The order in which to display tasks in the tree view."
                 }
               }
+            },
+            "terminal": {
+              "type": "object",
+              "description": "Terminal configuration options.",
+              "properties": {
+                "newPerRun": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Run every task in its own terminal tab and allow several runs of the same task at once. When disabled, VS Code's defaults apply: one running instance per task, a shared terminal, and a prompt to terminate the running instance."
+                }
+              }
             }
           }
         }
@@ -375,6 +426,7 @@
     "lint": "eslint src --ext ts",
     "test": "vscode-test",
     "package": "vsce package",
+    "package:custom": "node scripts/package-custom.mjs",
     "publish:vsce": "vsce publish --no-dependencies",
     "publish:ovsx": "ovsx publish --no-dependencies",
     "vscode:prepublish": "pnpm run bundle"

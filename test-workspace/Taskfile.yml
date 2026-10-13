@@ -48,3 +48,13 @@ tasks:
     vars:
       RED: \033[1;31m
       NC: \033[0m
+
+  long-running:
+    desc: Runs until it is stopped (used by the task run tests)
+    cmds:
+      - sleep 60
+
+  failing:
+    desc: Exits with an error (used by the task run tests)
+    cmds:
+      - exit 3

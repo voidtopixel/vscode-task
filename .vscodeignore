@@ -10,3 +10,4 @@ Taskfile.yml
 **/.eslintrc.json
 **/*.map
 **/*.ts
+scripts/**

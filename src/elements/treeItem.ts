@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { Namespace } from '../models/models.js';
 import { TaskDefinition } from '../models/taskDefinition.js';
+import { taskRuns } from '../services/taskRuns.js';
 
 export type TreeItem = WorkspaceTreeItem | NamespaceTreeItem | TaskTreeItem;
 
@@ -72,5 +73,16 @@ export class TaskTreeItem extends vscode.TreeItem {
                 );
         }
         this.contextValue = `taskTreeItem`;
+
+        const running = taskRuns.runningCount(this.definition);
+        if (running > 0) {
+            const state = running > 1 ? `running ×${running}` : 'running';
+            this.description = this.description ? `${state} · ${this.description}` : state;
+            this.iconPath = new vscode.ThemeIcon('loading~spin');
+            this.contextValue = `taskTreeItem.running`;
+        } else if (taskRuns.lastRunFailed(this.definition)) {
+            this.iconPath = new vscode.ThemeIcon('error', new vscode.ThemeColor('vscodetask.failedIcon'));
+            this.tooltip = `${this.label}: the last run failed`;
+        }
     }
 }

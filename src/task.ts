@@ -5,6 +5,7 @@ import { ActivityBar } from './elements/activityBar.js';
 import { Task } from './models/models.js';
 import { TaskProvider } from './providers/taskProvider.js';
 import { taskfileSvc } from './services/taskfile.js';
+import { taskRuns } from './services/taskRuns.js';
 import { log } from './utils/log.js';
 import { configKey, oldConfigKey, settings, UpdateOn } from './utils/settings.js';
 import { Taskfile } from './models/taskfile.js';
@@ -158,6 +159,23 @@ export class TaskExtension {
             }
         }));
 
+        // Stop task
+        context.subscriptions.push(vscode.commands.registerCommand('vscode-task.stopTask', async (treeItem?: TaskTreeItem) => {
+            log.info("Command: vscode-task.stopTask");
+            if (treeItem?.definition) {
+                await taskRuns.stop(treeItem.definition);
+            }
+        }));
+
+        // Restart task (with the args of its last run)
+        context.subscriptions.push(vscode.commands.registerCommand('vscode-task.restartTask', async (treeItem?: TaskTreeItem) => {
+            log.info("Command: vscode-task.restartTask");
+            if (treeItem?.definition) {
+                await taskRuns.stop(treeItem.definition);
+                taskfileSvc.runTask(treeItem.definition, taskRuns.lastArgs(treeItem.definition));
+            }
+        }));
+
         // Run task picker
         context.subscriptions.push(vscode.commands.registerCommand('vscode-task.runTaskPicker', () => {
             log.info("Command: vscode-task.runTaskPicker");
@@ -254,6 +272,9 @@ export class TaskExtension {
     }
 
     public registerListeners(context: vscode.ExtensionContext): void {
+        // Track running tasks for the tree view
+        taskRuns.register(context);
+
         // When a file on the system is changed, created or deleted
         this._watcher.onDidChange(async _ => { await this._onDidTaskfileChange(); });
         this._watcher.onDidCreate(async _ => { await this._onDidTaskfileChange(); });

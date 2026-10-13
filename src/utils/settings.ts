@@ -23,6 +23,7 @@ class Settings {
     public checkForUpdates!: boolean;
     public doubleClickTimeout!: number;
     public tree!: TreeSettings;
+    public terminal!: TerminalSettings;
 
     constructor() {
         this.update();
@@ -55,6 +56,7 @@ class Settings {
         this.checkForUpdates = config.get("checkForUpdates") ?? true;
         this.doubleClickTimeout = config.get("doubleClickTimeout") ?? 0;
         this.tree = new TreeSettings();
+        this.terminal = new TerminalSettings();
     }
 }
 
@@ -88,6 +90,25 @@ class TreeSettings {
         this.nesting = config.get("tree.nesting") ?? true;
         this.status = config.get("tree.status") ?? false;
         this.sort = config.get("tree.sort") ?? TreeSort.default;
+    }
+}
+
+class TerminalSettings {
+    public newPerRun!: boolean;
+
+    constructor() {
+        this.update();
+    }
+
+    // Fetches all the settings from the workspace configuration file
+    public update() {
+        log.info("Updating terminal settings");
+
+        // Get the workspace config
+        let config = vscode.workspace.getConfiguration(configKey);
+
+        // Set the properties
+        this.newPerRun = config.get("terminal.newPerRun") ?? true;
     }
 }
 

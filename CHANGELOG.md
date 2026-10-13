@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Running a task from the tree view opens a new terminal tab per run, and a
+  task that is still running can be started again without the "Select an
+  instance to terminate" prompt. Controlled by the new
+  `taskfile.terminal.newPerRun` setting (default `true`).
+- The tree view shows running tasks with a spinner ("running ×2" for several
+  runs) and marks tasks whose last run failed. Running tasks get inline Stop
+  and Restart buttons; Restart reuses the arguments of the last run.
+
 ## v1.0.1 - 2026-02-19
 
 - Fixed a bug where the minimum version required check was not working and
